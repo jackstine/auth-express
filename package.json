@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev-server": "export AUTH_ENV=dev && nodemon src/server.js",
-    "test": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.nc.test.js')"
+    "dev-node-server": "export AUTH_ENV=dev && node src/server.js",
+    "test": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.nc.test.js')",
+    "latest": "npm install @nodeauth/auth-pg@latest"
   },
   "keywords": [
     "authentication",
@@ -14,7 +16,7 @@
     "tokens"
   ],
   "dependencies": {
-    "@nodeauth/auth-pg": "^0.0.6",
+    "@nodeauth/auth-pg": "^0.0.8",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

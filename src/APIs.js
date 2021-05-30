@@ -31,7 +31,7 @@ const addAPI = function(app, apis) {
     apis = [apis];
   }
   for(let api of apis) {
-    let extention = `/${api.extension}/`;
+    let extention = `/${api.extension}`;
     //gets come in to the req.query
     addExtensions(extention, api.gets, app.get.bind(app), api.middleware);
     addExtensions(extention, api.posts, app.post.bind(app), api.middleware);
@@ -43,12 +43,23 @@ const addAPI = function(app, apis) {
  function addExtensions(extention, apis, app, middleware) {
   if (apis) {
     apis.forEach(function(api) {
-      let route = extention + api.route;
+      let route = extention
+      if (api.route && api.route !== '') {
+        route = route + `/${api.route}`
+      }
       if (middleware) {
         app(route, middleware);
       }
       console.log(route)
-      app(route, api.func);
+      app(route, (req, res, next) => {
+        // if the function is not a async function, promise
+        // then add a try catch
+        api.func(req, res, next).catch(err => {
+          console.error(err)
+          res.status(500)
+          res.send('ERROR')
+        })
+      });
     });
   }
 }

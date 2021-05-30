@@ -18,6 +18,7 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
+// ERROR HANDLING DONE IN ./APIs.js
 
 /** BEGIN API ROUTES */
 const APIS = require('./APIs')
