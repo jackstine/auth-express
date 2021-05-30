@@ -1,0 +1,27 @@
+{
+  "name": "authentication-express",
+  "version": "1.0.0",
+  "description": "this is an extended Authentication package for Express",
+  "main": "index.js",
+  "scripts": {
+    "dev-server": "export AUTH_ENV=dev && nodemon src/server.js",
+    "test": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.nc.test.js')"
+  },
+  "keywords": [
+    "authentication",
+    "express",
+    "users",
+    "tokens"
+  ],
+  "dependencies": {
+    "@nodeauth/auth-pg": "^0.0.6",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "http": "*",
+    "pg": "^8.6.0"
+  },
+  "author": "Jacob Cukjati",
+  "license": "ISC"
+}
