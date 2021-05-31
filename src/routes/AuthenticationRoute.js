@@ -3,17 +3,17 @@ const authPG = require('@nodeauth/auth-pg')
 const login = async function (req, res) {
   let user = req.body.user
   console.log(user)
-  authPG.auth.token.login(user.email, user.password).then(resp => {
-    // TODO when the user logins in with the forgotten password
-    // I need to check a flag, and tell the front end
-    // this will redirect the user to create a new password for that user
-    console.log(resp)
-    if (resp.success) {
-      res.send(resp)
-    } else {
-      res.status(401, {message: 'GET OFF MY WEBSITE'})
-    }
-  })
+  let authResp = await authPG.auth.token.login(user.email, user.password)
+  // TODO when the user logins in with the forgotten password
+  // I need to check a flag, and tell the front end
+  // this will redirect the user to create a new password for that user
+  console.log(authResp)
+  if (authResp.success) {
+    user = await authPG.auth.users.getUser(user.email)
+    res.send({user, ...authResp})
+  } else {
+    res.status(401, {message: 'GET OFF MY WEBSITE'})
+  }
 }
 
 // PROPABLY not going to call, will use in APIs to send new tokens to users.

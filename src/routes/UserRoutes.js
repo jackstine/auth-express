@@ -7,7 +7,7 @@ const createUser = async function (req, res, next) {
   let resp = await authPG.auth.users.createUserVerificationAndPassword(userInfo)
   // TODO need to create email to make link for user verification
   let v = resp.verification.verification_code
-  let verificationLink = `${config.websiteURL}/user/verify?firstName=${null}&lastName=${null}&verify=${v}`
+  let verificationLink = `${config.websiteURL}user/verify?firstName=${null}&lastName=${null}&verify=${v}`
   console.log(verificationLink)
   res.send(resp)
   // .catch(err => {
@@ -46,7 +46,7 @@ const resetWithTempPassword = async function (req, res) {
   let userId = req.body.user_id
   let tempPassword = req.body.tempPassword
   let newPassword = req.body.newPassword
-  authPG.auth.users.resetPasswordFromTemporaryPassword(userId, tempPassword, newPassword).then(resp => {
+  authPG.auth.users.resetPasswordFromTemporaryPassword(userId, tempPassword, newPassword).then(async resp => {
     if (resp) {
       let user = await authPG.auth.users.getUser(userId)
       res.send({success: true, user})
