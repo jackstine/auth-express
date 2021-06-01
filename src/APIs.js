@@ -1,3 +1,22 @@
+const authPg = require('@nodeauth/auth-pg')
+
+const authenticateAPI = async function (req, res, next) {
+  let authToken = req.get('authorization')
+  if (authToken) {
+    let authResp = await authPg.auth.token.authenticateToken(authToken)
+    if (authResp) {
+      console.log('ACCESS')
+      next()
+    } else {
+      console.log('No ACCESS')
+      res.status(401, 'Unauthorized')
+    }
+  } else {
+    console.log('No ACCESS')
+    res.status(401, 'Unauthorized')
+  }
+}
+
 /**
  * 
  * To add apis call addAPI(app, API);
@@ -9,23 +28,6 @@ const addAPIs = function (app, listOfAPIs) {
   }
 };
 
-/* 
-  TODO change the layout of the APIs
-  dont change the code below this is for setting up the APIs for the server
-  each API is a object of  the following
-  {
-    gets:
-    posts:
-    puts:
-    deletes:
-  }
-  of which contain a list of these objects
-  {
-    middleware: the middleware function
-    route: the route for the API
-    func: the function to call at this route
-  }
-*/
 const addAPI = function(app, apis) {
   if (!Array.isArray(apis)) {
     apis = [apis];
@@ -46,6 +48,9 @@ const addAPI = function(app, apis) {
       let route = extention
       if (api.route && api.route !== '') {
         route = route + `/${api.route}`
+      }
+      if (!(api.auth === false)) {
+        app(route, authenticateAPI)
       }
       if (middleware) {
         app(route, middleware);

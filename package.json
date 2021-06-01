@@ -16,7 +16,7 @@
     "tokens"
   ],
   "dependencies": {
-    "@nodeauth/auth-pg": "^0.0.8",
+    "@nodeauth/auth-pg": "^0.0.12",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
