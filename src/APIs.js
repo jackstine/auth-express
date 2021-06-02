@@ -4,7 +4,9 @@ const authenticateAPI = async function (req, res, next) {
   let authToken = req.get('authorization')
   if (authToken) {
     let authResp = await authPg.auth.token.authenticateToken(authToken)
-    if (authResp) {
+    if (authResp.success) {
+      req.__authenticationToken = req.get('authorization')
+      req.__authentication = authResp
       console.log('ACCESS')
       next()
     } else {

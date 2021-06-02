@@ -26,6 +26,30 @@ Use the `sql/createTables.sql` if you plan to create the postgres tables.
 - **POST/user/password/forgot/reset** - requires `user_id` and `tempPassword` `newPassword`
 - **POST/user** - create a user, requires `user_id` and `password`
 
+## Routes
+All routes that require authentication, this is set by default, will set the properties `__authenticationToken` and `__authentication` inside the request object in express.
+
+`APIs.js` set up the routes, using this structure below.  Add routes in `server.js`.
+
+```javascript
+const UserRoutes = {
+  extension: 'user',
+  gets: [
+    {func: hasEmailForUser, route: 'email', auth: false}, // points to /user/email
+    {func: getUser, route: ':user'} // points to /user/:user
+  ],
+  posts: [
+    {func: createUser, route: "", auth: false}, // user
+    {func: verifyUser, route: "verify", auth: false}, // user/verify
+    {func: forgotPassword, route: "password/forgot", auth: false}, // user/password/forgot
+    {func: resetWithTempPassword, route: "password/forgot/reset", auth: false} // user/password/forgot/reset
+  ],
+  puts: [
+    {func: updateUser, route: ""}
+  ]
+}
+```
+
 ## Schemas
 
 ### User

@@ -13,8 +13,13 @@ const createUser = async function (req, res, next) {
 }
 
 const updateUser = async function (req, res) {
+  /**
+   * We need to update the user, only if the request is sent from 
+   * the user
+   */
   let userInfo = req.body.user
-  authPG.auth.users.updateUser(userInfo).then(resp => {
+  // I have the auth token, which has the user_id in it.
+  authPG.auth.users.updateUser(userInfo, req.__authenticationToken).then(resp => {
     res.send(resp)
   })
 }
