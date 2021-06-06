@@ -18,13 +18,31 @@ const verifyToken = async function (req, res) {
   })
 }
 
+const verifyGoogle = async function (req, res) {
+  // TODO need to finish up
+  let googleInfo = await authPG.auth.token.googleSignIn(req.body.token)
+  if (googleInfo.success) {
+    if (googleInfo.is_new_user) {
+      let v = resp.verification.verification_code
+      delete resp.verification
+      let verificationLink = `${config.websiteURL}user/verify?firstName=${user.first_name}&lastName=${user.last_name}&verify=${v}`
+      console.log(verificationLink)
+      // TODO send verification token
+    }
+    res.send(googleInfo)
+  }
+  res.status(401)
+  res.send('NOT AUTHORIZED')
+}
+
 const AuthenticationRoutes = {
   extension: 'auth',
   gets: [
     {func: verifyToken, route: "token/verify"}
   ],
   posts: [
-    {func: login, route: "login", auth: false}
+    {func: login, route: "login", auth: false},
+    {func: verifyGoogle, route: 'google', auth: false}
   ]
 }
 

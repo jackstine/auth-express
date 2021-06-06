@@ -8,6 +8,11 @@ module.exports = {
             password: process.env.AUTH_PASSWORD
         }
     },
+    google: {
+      secret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      token: process.env.GOOGLE_AUTH_TOKEN
+    },
     websiteURL: 'http://localhost:3000/',
     port: 8080
 }

@@ -8,7 +8,7 @@ const config = require('./config')
 const authPG = require('@nodeauth/auth-pg')
 const pg = require('pg')
 const client = new pg.Client(config.DBs.authenticationServer)
-authPG.create({pgClient: client})
+authPG.create({pgClient: client, googleClientId: process.env.GOOGLE_CLIENT_ID})
 client.connect()
 /** END AUTH-PG */
 
