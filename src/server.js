@@ -3,11 +3,13 @@ const http = require('http')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const config = require('./config')
+const {CONNECTION} = require('./serverlogic/RDS')
 
 /** BEGIN AUTH-PG */
 const authPG = require('@nodeauth/auth-pg')
 const pg = require('pg')
 const client = new pg.Client(config.DBs.authenticationServer)
+CONNECTION.con = client
 authPG.create({pgClient: client})
 client.connect()
 /** END AUTH-PG */
@@ -16,6 +18,7 @@ client.connect()
 
 const app = express()
 app.use(cors())
+// TODO bodyParser is dprecated
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 // ERROR HANDLING DONE IN ./APIs.js

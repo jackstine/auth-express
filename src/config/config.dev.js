@@ -8,6 +8,10 @@ module.exports = {
             password: process.env.AUTH_PASSWORD
         }
     },
+    stripe: {
+      secret: process.env.STRIPE_SECRET,
+      clientId: process.env.STRIPE_CLIENT_ID
+    },
     websiteURL: 'http://localhost:3000/',
     port: 8080
 }
