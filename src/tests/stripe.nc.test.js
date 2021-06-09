@@ -70,9 +70,9 @@ describe('#Stripe', function () {
       })
     })
   })
-  describe('#getCustomers', function () {
+  describe('#getAllCustomers', function () {
     it('should get the customers', function (done) {
-      Stripe.getCustomers().then(resp => {
+      Stripe.getAllCustomers().then(resp => {
         console.log(resp)
         done()
       })

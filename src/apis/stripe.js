@@ -1,18 +1,20 @@
 const config = require('../config')
 const stripe = require('stripe')(config.stripe.secret);
 
+
+// TODO refactor this page
 const createCustomer = async function (customerInfo) {
   // https://stripe.com/docs/api/customers/create
   const customer = await stripe.customers.create(customerInfo);
   return customer
 }
 
-const getCustomers = async function () {
-  const customers = await stripe.customers.list({limit: 3,});
+const getAllCustomers = async function () {
+  const customers = await stripe.customers.list();
   return customers
 }
 
-const getACustomer = async function (custId) {
+const getCustomer = async function (custId) {
   // https://stripe.com/docs/api/customers/retrieve
   return await stripe.customers.retrieve(custId);
 }
@@ -33,13 +35,18 @@ const createPrice = async function (price) {
  */
 const signUpForSubscription = async function (subscriptionInfo) {
   const subscription = await stripe.subscriptions.create({
-    customer: subscriptionInfo.stripe_customer_id,
+    customer: subscriptionInfo.customerId,
     items: [{
-      price: subscriptionInfo.stripe_price_id,
+      price: subscriptionInfo.priceId,
     }],
     payment_behavior: "default_incomplete",
+    expand: ['latest_invoice.payment_intent']
   });
   return subscription
+}
+
+const updateSubscription = async function (subId, paymentMethodId) {
+  return await stripe.subscriptions.update(subId,{default_payment_method: paymentMethodId});
 }
 
 const cancelSubscription = async function (subscriptionId) {
@@ -97,12 +104,16 @@ const updateSub = async function (paymentInfo) {
  * @pa
  */
 const createCustomerSubscription = async function (paymentInformation) {
-    let customer = await getACustomer(paymentInformation.customerId)
+    let customer = await getCustomer(paymentInformation.customerId)
     if (customer) {
-      return await signUpForSubscription({
+      let sub = await signUpForSubscription({
         customerId: customer.id,
         priceId: paymentInformation.priceId
       })
+      return {
+        customer,
+        subscription: sub
+      }
     } else {
       throw Error(`The customer ${paymentInformation.customerId} does not exist, createCustomerSubscription()`)
     }
@@ -132,17 +143,19 @@ const getAllPrices = async function () {
 
 module.exports = {
   createCustomer,
-  getCustomers,
+  getAllCustomers,
   createProduct,
   createPrice,
-  getACustomer,
+  getCustomer,
   signUpForSubscription,
   cancelSubscription,
+  updateSubscription,
   createCardPaymentMethod,
   getInvoice,
   getPaymentIntent,
   createProductandPrice,
   getAllPrices,
-  getActiveProducts
+  getActiveProducts,
+  createCustomerSubscription
 }
 

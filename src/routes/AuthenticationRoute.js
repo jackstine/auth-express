@@ -12,10 +12,9 @@ const login = async function (req, res) {
 }
 
 const verifyToken = async function (req, res) {
-  let authToken = req.get('authentication')
-  authPG.auth.token.authenticateToken(authToken).then(resp => {
-    res.send(resp)
-  })
+  let user_id = req.__authentication.data.user_id
+  let user = await authPG.auth.users.getUser(user_id)
+  res.send({success: req.__authentication.success, user})
 }
 
 const AuthenticationRoutes = {

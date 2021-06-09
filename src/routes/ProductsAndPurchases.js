@@ -8,7 +8,7 @@ const getProductsAndPricing = async function (req, res) {
 const ProductRoutes = {
   extension: 'products',
   gets: [
-    {func: getProductsAndPricing, route: ""}
+    {func: getProductsAndPricing, route: "", auth: false}
   ]
 }
 

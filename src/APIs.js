@@ -36,7 +36,7 @@ const addAPI = function(app, apis) {
   }
   for(let api of apis) {
     let extention = `/${api.extension}`;
-    //gets come in to the req.query
+    // gets come in to the req.query
     addExtensions(extention, api.gets, app.get.bind(app), api.middleware);
     addExtensions(extention, api.posts, app.post.bind(app), api.middleware);
     addExtensions(extention, api.puts, app.put.bind(app), api.middleware);

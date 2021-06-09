@@ -27,7 +27,9 @@ app.use(bodyParser.urlencoded({extended: true}))
 const APIS = require('./APIs')
 const AuthRoutes = require('./routes/AuthenticationRoute')
 const UserRoutes = require('./routes/UserRoutes')
-APIS(app, [AuthRoutes, UserRoutes])
+const ProductRoutes = require('./routes/ProductsAndPurchases')
+const CustomerRoutes = require('./routes/Customer')
+APIS(app, [AuthRoutes, UserRoutes, ProductRoutes, CustomerRoutes])
 /** END APIS ROUTES */
 
 const httpServer = http.createServer(app)

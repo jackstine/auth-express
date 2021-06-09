@@ -8,6 +8,7 @@ const createUser = async function (req, res, next) {
   let v = resp.verification.verification_code
   delete resp.verification
   let verificationLink = `${config.websiteURL}user/verify?firstName=${null}&lastName=${null}&verify=${v}`
+  // need to send the verification link in an email
   console.log(verificationLink)
   res.send(resp)
 }
