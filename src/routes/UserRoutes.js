@@ -40,7 +40,7 @@ const forgotPassword = async function (req, res) {
       res.send()
     } else {
       console.log(resp)
-      // REDO send email to user with the new password, to confirm
+      // send email to user with the new password, to confirm
       res.send({})
     }
   })

@@ -32,8 +32,9 @@ const authorizeCreateCustomer = async function (req, res) {
 const makeSubscriptionPayment = async function (req, res) {
   // LAST
   let sub = req.body.sub
+  let customer = req.body.customer
   let paymentMethod = req.body.paymentMethod
-  let updatedSub = await stripeAPI.updateSubscription(sub.id, paymentMethod.id)
+  let updatedSub = await stripeAPI.attachPaymentMethod(sub.id, paymentMethod.id, customer.id)
   console.log(updatedSub)
   res.send(updatedSub)
 }

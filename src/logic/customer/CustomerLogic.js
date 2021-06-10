@@ -71,9 +71,7 @@ const createCustomer = async function (customerInfo) {
       sC.id,
       customerInfo.billing
     )
-    return {
-      dbC
-    }
+    return dbC
   } else {
     throw Error(`the user does not exist ${customerInfo.user_id}`)
   }

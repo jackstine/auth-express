@@ -1,6 +1,13 @@
 const config = require('../config')
 const stripe = require('stripe')(config.stripe.secret);
 
+/**
+ * TEST CARDS - https://stripe.com/docs/billing/subscriptions/elements#test
+ * Strong Authentication - https://stripe.com/docs/billing/migration/strong-customer-authentication
+ * Payouts - https://stripe.com/docs/payouts
+ * Refunds - https://stripe.com/docs/refunds
+ * WebHook Fullfillment - https://stripe.com/docs/webhooks/integration-builder
+ */
 
 // TODO refactor this page
 const createCustomer = async function (customerInfo) {
@@ -52,6 +59,10 @@ const updateSubscription = async function (subId, paymentMethodId) {
 const cancelSubscription = async function (subscriptionId) {
   const deleted = await stripe.subscriptions.del(subscriptionId);
   return deleted
+}
+
+const getSubscription = async function (subId) {
+  return await stripe.subscriptions.retrieve(subId)
 }
 
 const createCard = async function () {
@@ -141,6 +152,12 @@ const getAllPrices = async function () {
   return await stripe.prices.list()
 }
 
+
+const attachPaymentMethod = async function (subId, paymentId, customerId) {
+  await stripe.paymentMethods.attach(paymentId, {customer: customerId});
+  return await updateSubscription(subId, paymentId)
+}
+
 module.exports = {
   createCustomer,
   getAllCustomers,
@@ -150,6 +167,8 @@ module.exports = {
   signUpForSubscription,
   cancelSubscription,
   updateSubscription,
+  getSubscription,
+  attachPaymentMethod,
   createCardPaymentMethod,
   getInvoice,
   getPaymentIntent,

@@ -1,5 +1,6 @@
 const Stripe = require('../apis/stripe')
 
+
 let customerInfo = {
   email: 'ecstaticjack@gmail.com',
   name: 'jacob paul cukjati IV',
@@ -35,15 +36,11 @@ let billing = {
 
 describe('#Stripe', function () {
   describe('#createCustomer', function () {
-    it('should create a customer', function (done) {
-      let customer = {
-        address: {...billing.address},
-        ...customerInfo
-      }
-      Stripe.createCustomer(customer).then(resp => {
+    it.only('should create a customer', function (done) {
+      Stripe.getSubscription('sub_JdZesXf4Kefpwx').then(resp => {
         console.log(resp)
         done()
-      }).catch(console.error)
+      })
     })
   })
   describe('#createProduct', function () {
