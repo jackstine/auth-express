@@ -1,101 +1,120 @@
-const authPG = require('@nodeauth/auth-pg')
-const config = require('../config')
+const authPG = require("@nodeauth/auth-pg");
+const config = require("../config");
+const emails = require("../static/emails");
 
 const createUser = async function (req, res, next) {
-  let userInfo = req.body.user
-  userInfo.user_id = userInfo.email
-  let resp = await authPG.auth.users.createUserVerificationAndPassword(userInfo)
-  let v = resp.verification.verification_code
-  delete resp.verification
-  let verificationLink = `${config.websiteURL}user/verify?firstName=${null}&lastName=${null}&verify=${v}`
-  // need to send the verification link in an email
-  console.log(verificationLink)
-  res.send(resp)
-}
+  let userInfo = req.body.user;
+  userInfo.user_id = userInfo.email;
+  let resp = await authPG.auth.users.createUserVerificationAndPassword(
+    userInfo
+  );
+  let v = resp.verification.verification_code;
+  delete resp.verification;
+  let verificationLink = `${config.websiteURL}user/verify?firstName=${userInfo.first_name}&lastName=${userInfo.last_name}&verify=${v}`;
+  let html = await emails.createVerificationEmail({
+    company: "Test Company",
+    name: `${userInfo.first_name} ${userInfo.last_name}`,
+    verificationLink: verificationLink,
+  });
+  config.emailService.send(userInfo.email, html, "Verify email");
+  // LATER get rid of the console log on the verification Link
+  console.log(verificationLink);
+  res.send(resp);
+};
 
 const updateUser = async function (req, res) {
   /**
-   * We need to update the user, only if the request is sent from 
+   * We need to update the user, only if the request is sent from
    * the user
    */
-  let userInfo = req.body.user
+  let userInfo = req.body.user;
   // I have the auth token, which has the user_id in it.
-  authPG.auth.users.updateUser(userInfo, req.__authenticationToken).then(resp => {
-    res.send(resp)
-  })
-}
+  authPG.auth.users
+    .updateUser(userInfo, req.__authenticationToken)
+    .then((resp) => {
+      res.send(resp);
+    });
+};
 
 const verifyUser = async function (req, res) {
-  let verificationCode = req.body.verificationCode
-  authPG.auth.users.verifyUser(verificationCode).then(resp => {
-    res.send(resp)
-  })
-}
+  let verificationCode = req.body.verificationCode;
+  authPG.auth.users.verifyUser(verificationCode).then((resp) => {
+    res.send(resp);
+  });
+};
 
 const forgotPassword = async function (req, res) {
-  let userId = req.body.email
-  authPG.auth.users.forgotPassword(userId).then(resp => {
+  let email = req.body.email;
+  authPG.auth.users.forgotPassword(email).then(async (resp) => {
     if (resp === null) {
-      res.status(401)
-      res.send()
+      res.status(401);
+      res.send();
     } else {
-      console.log(resp)
-      // send email to user with the new password, to confirm
-      res.send({})
+      // LATER get rid of console log here...
+      console.log(resp);
+      let html = await emails.createForgotPassword({
+        new_password: resp.password,
+      });
+      config.emailService.send(email, html, "Forgot Password");
+      res.send({});
     }
-  })
-}
+  });
+};
 
 const resetWithTempPassword = async function (req, res) {
-  let userId = req.body.user_id
-  let tempPassword = req.body.tempPassword
-  let newPassword = req.body.newPassword
-  authPG.auth.users.resetPasswordFromTemporaryPassword(userId, tempPassword, newPassword).then(async resp => {
-    if (resp) {
-      let results = await Promise.all([
-        authPG.auth.users.getUser(userId),
-        authPG.auth.token.generateToken(userId)
-      ])
-      res.send({success: true, user: results[0], token: results[1]})
-    } else {
-      res.send('YOU SUCK')
-    }
-  })
-}
+  let userId = req.body.user_id;
+  let tempPassword = req.body.tempPassword;
+  let newPassword = req.body.newPassword;
+  authPG.auth.users
+    .resetPasswordFromTemporaryPassword(userId, tempPassword, newPassword)
+    .then(async (resp) => {
+      if (resp) {
+        let results = await Promise.all([
+          authPG.auth.users.getUser(userId),
+          authPG.auth.token.generateToken(userId),
+        ]);
+        res.send({ success: true, user: results[0], token: results[1] });
+      } else {
+        res.send("YOU SUCK");
+      }
+    });
+};
 
 const hasEmailForUser = async function (req, res) {
-  let email = req.param.email
-  authPG.auth.users.getUser(email).then(hasEmail => {
+  let email = req.param.email;
+  authPG.auth.users.getUser(email).then((hasEmail) => {
     if (hasEmail) {
-      res.send({hasEmail: true, email})
+      res.send({ hasEmail: true, email });
     } else {
-      res.send({hasEmail: false, email})
+      res.send({ hasEmail: false, email });
     }
-  })
-}
+  });
+};
 
 const getUser = async function (req, res) {
-  let user_id = req.param.user
-  authPG.auth.users.getUser(user_id).then(user => {
-    res.send(user)
-  })
-}
+  let user_id = req.param.user;
+  authPG.auth.users.getUser(user_id).then((user) => {
+    res.send(user);
+  });
+};
 
 const UserRoutes = {
-  extension: 'user',
+  extension: "user",
   gets: [
-    {func: hasEmailForUser, route: 'email', auth: false},
-    {func: getUser, route: ':user'}
+    { func: hasEmailForUser, route: "email", auth: false },
+    { func: getUser, route: ":user" },
   ],
   posts: [
-    {func: createUser, route: "", auth: false},
-    {func: verifyUser, route: "verify", auth: false},
-    {func: forgotPassword, route: "password/forgot", auth: false},
-    {func: resetWithTempPassword, route: "password/forgot/reset", auth: false}
+    { func: createUser, route: "", auth: false },
+    { func: verifyUser, route: "verify", auth: false },
+    { func: forgotPassword, route: "password/forgot", auth: false },
+    {
+      func: resetWithTempPassword,
+      route: "password/forgot/reset",
+      auth: false,
+    },
   ],
-  puts: [
-    {func: updateUser, route: ""}
-  ]
-}
+  puts: [{ func: updateUser, route: "" }],
+};
 
-module.exports = [UserRoutes]
+module.exports = [UserRoutes];
