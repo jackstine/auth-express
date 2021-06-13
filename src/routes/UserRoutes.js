@@ -11,12 +11,11 @@ const createUser = async function (req, res, next) {
   let v = resp.verification.verification_code;
   delete resp.verification;
   let verificationLink = `${config.websiteURL}user/verify?firstName=${userInfo.first_name}&lastName=${userInfo.last_name}&verify=${v}`;
-  let html = await emails.createVerificationEmail({
-    company: "Test Company",
+  emails.createVerificationEmail(userInfo.email, {
+    company: config.company_name,
     name: `${userInfo.first_name} ${userInfo.last_name}`,
     verificationLink: verificationLink,
   });
-  config.emailService.send(userInfo.email, html, "Verify email");
   // LATER get rid of the console log on the verification Link
   console.log(verificationLink);
   res.send(resp);
@@ -52,10 +51,9 @@ const forgotPassword = async function (req, res) {
     } else {
       // LATER get rid of console log here...
       console.log(resp);
-      let html = await emails.createForgotPassword({
+      emails.createForgotPassword(email, {
         new_password: resp.password,
       });
-      config.emailService.send(email, html, "Forgot Password");
       res.send({});
     }
   });

@@ -16,6 +16,7 @@ module.exports = {
   },
   websiteURL: "http://localhost:3000/",
   port: 8080,
+  company_name: "Test Company",
   emailService: SES.createEmailService(
     process.env.AWS_EMAIL_SENDER,
     process.env.AWS_EMAIL_ARN

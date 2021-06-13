@@ -19,6 +19,12 @@ const createCustomer = async function (customerInfo) {
   return customer;
 };
 
+const getCustomerSubscriptions = async function (customer_id) {
+  return await stripe.subscriptions.list({
+    customer: customer_id,
+  });
+};
+
 const getAllCustomers = async function () {
   const customers = await stripe.customers.list();
   return customers;
@@ -64,8 +70,7 @@ const updateSubscription = async function (subId, paymentMethodId) {
 };
 
 const cancelSubscription = async function (subscriptionId) {
-  const deleted = await stripe.subscriptions.del(subscriptionId);
-  return deleted;
+  return await stripe.subscriptions.del(subscriptionId);
 };
 
 const getSubscription = async function (subId) {
@@ -168,7 +173,11 @@ const attachPaymentMethod = async function (subId, paymentId, customerId) {
 
 const getSource = async function (customerId) {
   let stripeCustomer = await getCustomer(customerId);
-  return await stripe.sources.retrieve(stripeCustomer.default_source);
+  if (stripeCustomer.default_source) {
+    return await stripe.sources.retrieve(stripeCustomer.default_source);
+  } else {
+    return null;
+  }
 };
 
 module.exports = {
@@ -191,4 +200,5 @@ module.exports = {
   getActiveProducts,
   createCustomerSubscription,
   getSource,
+  getCustomerSubscriptions,
 };
