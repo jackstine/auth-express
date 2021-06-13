@@ -5,6 +5,10 @@ const bodyParser = require("body-parser");
 const config = require("./config");
 const { CONNECTION } = require("./serverlogic/RDS");
 
+process.on("unhandledRejection", function (err) {
+  console.error(err);
+});
+
 /** BEGIN AUTH-PG */
 const authPG = require("@nodeauth/auth-pg");
 const pg = require("pg");

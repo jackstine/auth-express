@@ -1,23 +1,14 @@
 const authPG = require("@nodeauth/auth-pg");
-const config = require("../config");
 const emails = require("../static/emails");
+const UserLogic = require("../appLogic/UserLogic");
 
 const createUser = async function (req, res, next) {
   let userInfo = req.body.user;
-  userInfo.user_id = userInfo.email;
-  let resp = await authPG.auth.users.createUserVerificationAndPassword(
-    userInfo
-  );
+  userInfo.email = userInfo.email;
+  let resp = await authPG.auth.users.createUserVerificationAndPassword(userInfo);
   let v = resp.verification.verification_code;
   delete resp.verification;
-  let verificationLink = `${config.websiteURL}user/verify?firstName=${userInfo.first_name}&lastName=${userInfo.last_name}&verify=${v}`;
-  emails.createVerificationEmail(userInfo.email, {
-    company: config.company_name,
-    name: `${userInfo.first_name} ${userInfo.last_name}`,
-    verificationLink: verificationLink,
-  });
-  // LATER get rid of the console log on the verification Link
-  console.log(verificationLink);
+  UserLogic.sendVerifyInformation(userInfo, v);
   res.send(resp);
 };
 
@@ -27,12 +18,10 @@ const updateUser = async function (req, res) {
    * the user
    */
   let userInfo = req.body.user;
-  // I have the auth token, which has the user_id in it.
-  authPG.auth.users
-    .updateUser(userInfo, req.__authenticationToken)
-    .then((resp) => {
-      res.send(resp);
-    });
+  // I have the auth token, which has the email in it.
+  authPG.auth.users.updateUser(userInfo, req.__authenticationToken).then((resp) => {
+    res.send(resp);
+  });
 };
 
 const verifyUser = async function (req, res) {
@@ -60,7 +49,7 @@ const forgotPassword = async function (req, res) {
 };
 
 const resetWithTempPassword = async function (req, res) {
-  let userId = req.body.user_id;
+  let userId = req.body.email;
   let tempPassword = req.body.tempPassword;
   let newPassword = req.body.newPassword;
   authPG.auth.users
@@ -90,8 +79,8 @@ const hasEmailForUser = async function (req, res) {
 };
 
 const getUser = async function (req, res) {
-  let user_id = req.param.user;
-  authPG.auth.users.getUser(user_id).then((user) => {
+  let email = req.param.user;
+  authPG.auth.users.getUser(email).then((user) => {
     res.send(user);
   });
 };

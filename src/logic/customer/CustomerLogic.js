@@ -5,7 +5,7 @@ const emails = require("../../static/emails");
 const config = require("../../config");
 
 /*
- * let cust = customer.getByUserId(user.user_id)
+ * let cust = customer.getByUserId(user.email)
  * if (!cust) {
  *    stripe.createCustomer()
  * } else {
@@ -15,7 +15,7 @@ const config = require("../../config");
 
 /**
  *
- * @param {*} user.user_id
+ * @param {*} user.email
  * @param {*} productPrice.product
  * @param {*} productPrice.price
  * @returns has_customer --
@@ -25,8 +25,7 @@ const config = require("../../config");
 const authorizeCustomer = async function (user, productPrice, cust) {
   cust = cust ?? null;
   if (!cust) {
-    // TODO need to change back to user_id when I refactor
-    let idOfUser = user.new_user_id ?? user.user_id;
+    let idOfUser = user.id;
     cust = await CustomerRepo.getCustomer(idOfUser);
   }
   console.log("THis is the customer");
@@ -37,7 +36,7 @@ const authorizeCustomer = async function (user, productPrice, cust) {
       ...productPrice,
     };
   } else {
-    // TODO add in the metadata using the user_id
+    // TODO add in the metadata using the email
     let customerSub = await stripeAPI.createCustomerSubscription({
       customerId: cust.stripe_id,
       priceId: productPrice.price.id,
@@ -53,30 +52,30 @@ const authorizeCustomer = async function (user, productPrice, cust) {
 /**
  *
  * @param {*} customerInfo.billing
- * @param {*} customerInfo.user_id
+ * @param {*} customerInfo.email
  * @returns
  */
 const createCustomer = async function (customerInfo) {
-  let user = await authPG.auth.users.getUser(customerInfo.user_id);
+  let user = await authPG.auth.users.getUser(customerInfo.email);
   if (user) {
     let stripeCustomer = {
       address: customerInfo.billing,
       email: user.email,
       name: `${user.first_name} ${user.last_name}`,
       metadata: {
-        user_id: user.user_id,
+        email: user.email,
       },
     };
     let sC = await stripeAPI.createCustomer(stripeCustomer);
     let dbC = await CustomerRepo.createCustomer(
-      customerInfo.new_user_id,
+      customerInfo.user_id,
       user.email,
       sC.id,
       customerInfo.billing
     );
     return dbC;
   } else {
-    throw Error(`the user does not exist ${customerInfo.user_id}`);
+    throw Error(`the user does not exist ${customerInfo.email}`);
   }
 };
 

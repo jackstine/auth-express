@@ -18,10 +18,9 @@ const authorizeCreateCustomer = async function (req, res) {
   let price = req.body.price;
   // TODO we might need more information for the customer
   // might have to add this to the UI
-  // TODO passed in the id of the user, as new_user_id
   let cust = await CustomerLogic.createCustomer({
-    user_id: user.user_id,
-    new_user_id: user.id,
+    email: user.email,
+    user_id: user.id,
     ...customer,
   });
   let custSub = await CustomerLogic.authorizeCustomer(user, { price }, cust);

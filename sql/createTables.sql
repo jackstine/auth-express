@@ -18,8 +18,7 @@ create table authentication.users (
 	first_name varchar(700),
 	last_name varchar(600),
 	username varchar(320) UNIQUE,
-	email varchar(320) UNIQUE,
-	user_id varchar(320) primary key,
+	email varchar(320) primary key,
 	phone varchar(20),
 	verified boolean default false,
 	created_date timestamp default CURRENT_TIMESTAMP
@@ -27,7 +26,7 @@ create table authentication.users (
 
 
 create table authentication.user_verification (
-	user_id varchar(320) UNIQUE,
+	email varchar(320) UNIQUE,
 	verification_code UUID primary key,
 	created timestamp default CURRENT_TIMESTAMP
 )
