@@ -10,6 +10,11 @@ module.exports = {
       password: process.env.AUTH_PASSWORD,
     },
   },
+  google: {
+    secret: process.env.GOOGLE_CLIENT_SECRET,
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    token: process.env.GOOGLE_AUTH_TOKEN,
+  },
   stripe: {
     secret: process.env.STRIPE_SECRET,
     clientId: process.env.STRIPE_CLIENT_ID,
@@ -17,8 +22,5 @@ module.exports = {
   websiteURL: "http://localhost:3000/",
   port: 8080,
   company_name: "Test Company",
-  emailService: SES.createEmailService(
-    process.env.AWS_EMAIL_SENDER,
-    process.env.AWS_EMAIL_ARN
-  ),
+  emailService: SES.createEmailService(process.env.AWS_EMAIL_SENDER, process.env.AWS_EMAIL_ARN),
 };
