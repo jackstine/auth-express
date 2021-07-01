@@ -1,5 +1,6 @@
 const CustomerLogic = require("../logic/customer/CustomerLogic");
 const stripeAPI = require("../apis/stripe");
+const auth = require('@nodeauth/auth-pg')
 
 const authorizeCustomer = async function (req, res) {
   let user = req.body.user;
@@ -24,7 +25,9 @@ const authorizeCreateCustomer = async function (req, res) {
     ...customer,
   });
   let custSub = await CustomerLogic.authorizeCustomer(user, { price }, cust);
-  res.send(custSub);
+  // needs to return a new refresh token with the customer Information
+  let refreshToken = await auth.auth.token.generateToken({...user, ...cust})
+  res.send({...custSub, refreshToken});
 };
 
 // This never gets called yet....
@@ -46,6 +49,10 @@ const makeSubscriptionPayment = async function (req, res) {
 };
 
 const addPaymentSource = async function (req, res) {
+  // this needs to authenticate the customer
+  // so that only the authorized customer can make this transaction
+  // have to validate the custId
+  // req.__authentication.custId
   let customer = req.body.customer;
   let source = req.body.source;
   let resp = await stripeAPI.createSourceForCustomer(customer.id, source.id);

@@ -1,9 +1,22 @@
 const authPG = require("@nodeauth/auth-pg");
 const UserLogic = require("../appLogic/UserLogic");
+const CustomerRepo = require('../logic/customer/CustomerRepo')
+
+
+let tokenize = function (tokenData) {
+  let cust = undefined
+  try {
+    cust = await CustomerRepo.getCustomerByEmail(tokenData.user.email)
+  } catch (ex) { 
+    // ignore all others
+  }
+  return cust
+}
 
 const login = async function (req, res) {
   let user = req.body.user;
-  let authResp = await authPG.auth.token.login(user.email, user.password);
+  let cust = tokenize({user}) 
+  let authResp = await authPG.auth.token.login(user.email, user.password, cust);
   if (authResp.success) {
     res.send(authResp);
   } else {
@@ -20,7 +33,10 @@ const verifyToken = async function (req, res) {
 
 const verifyGoogle = async function (req, res) {
   // TODO need to finish up
-  let googleInfo = await authPG.auth.__token.googleSignin(req.body.token);
+  let googleInfo = await authPG.auth.__token.googleSignin(req.body.token, tokenize);
+  /**
+   * have to generate a token for the user as well???
+   */
   if (googleInfo.success) {
     if (googleInfo.is_new_user) {
       // TODO use the verify email

@@ -41,6 +41,14 @@ class CustomerRepo extends RDS.RDS1 {
   async getCustomer (user_id) {
     return await this._selectOnePid(user_id)
   }
+
+  async getCustomerByEmail (email) {
+    return await this._selectWhere(`email='${email}'`)
+  }
+
+  async deleteAllCustomers () {
+    return await this._execute('delete from customers.customers')
+  }
 }
 
 
